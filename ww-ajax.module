@@ -1,0 +1,46 @@
+<?php
+/*
+ * Web-Wave example ajax reload for the Website.
+ */
+
+/**
+ * Implementation of hook_init().
+ */
+function wwajax_init(){
+    drupal_add_js(drupal_get_path('module', 'ww-ajax') . '/includes/js/ww-ajax.js', array('scope' => 'footer'));
+}
+
+/**
+ * Implements hook_menu().
+ */
+function wwajax_menu() {
+    $items['ajax/brand/%'] = array(
+        'title' => 'Get Data',
+        'page callback' => 'ww_term_ajax_brand',
+        'page arguments' => array(2),
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+    );
+    $items['ajax/blog/%'] = array(
+        'title' => 'Get Data',
+        'page callback' => 'ww_node_ajax_blog',
+        'page arguments' => array(2),
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+    );
+    return $items;
+}
+
+function ww_term_ajax_brand($tid){
+    $termload = taxonomy_term_load($tid);
+    $termview = taxonomy_term_view($termload);
+    $termhtml = drupal_render($termview);
+    drupal_json_output(array('status' => TRUE, 'data' => $termhtml));
+}
+
+function ww_node_ajax_blog($nid){
+    $node = node_load($nid);
+    $nodeview = node_view($node);
+    $nodehtml = render($nodeview);
+    drupal_json_output(array('status' => TRUE, 'data' => $nodehtml));
+}
